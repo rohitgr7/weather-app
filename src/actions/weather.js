@@ -11,6 +11,7 @@ export const updateLocation = (payload) => {
 
 export const startUpdateLocation = (searchLocation, callback) => {
   return (dispatch, getState, api) => {
+    searchLocation = searchLocation.toLowerCase();
     const newLocation = encodeURIComponent(searchLocation);
     const apiWithLocation = `${api}&q=${newLocation}`;
     axios.get(apiWithLocation)

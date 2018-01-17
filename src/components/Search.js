@@ -5,6 +5,10 @@ import { startUpdateLocation } from './../actions/weather';
 import WeatherData from './WeatherData';
 
 class Search extends Component {
+  state = {
+    qSearchState: ''
+  }
+
   getParameterByName = (name, url) => {
     name = name.replace(/[\[\]]/g, "\\$&");
     var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
@@ -16,11 +20,26 @@ class Search extends Component {
 
   componentDidMount() {
     const { search } = this.props.location;
-    const searchLocation = this.getParameterByName('q', search);
-    if (!search || !searchLocation) {
+    const { searchLocation } = this.props;
+    const qSearch = this.getParameterByName('q', search);
+    const { qSearchState } = this.state;
+    if (!qSearchState && qSearch) {
+      this.setState(() => ({ qSearchState: qSearch }));
+    }
+    if (!qSearch) {
       this.props.history.push('/');
-    } else {
-      this.props.startUpdateLocation(searchLocation, () => {});
+    } else if (!searchLocation) {
+      this.props.startUpdateLocation(qSearch, () => {});
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { search } = nextProps.location;
+    const { qSearchState } = this.state;
+    const qSearch = this.getParameterByName('q', search).toLowerCase();
+    if (qSearchState.toLowerCase() != qSearch) {
+      this.setState(() => ({ qSearchState: qSearch }));
+      this.props.startUpdateLocation(qSearch, () => {});
     }
   }
 
